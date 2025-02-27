@@ -1,0 +1,8 @@
+cat <<EOL > ~/.ssh/config
+Host server01
+    HostName 8.8.8.8
+    IdentityFile ~/.ssh/school
+    IdentitiesOnly yes
+    PasswordAuthentication no
+    User ubuntu
+EOL
