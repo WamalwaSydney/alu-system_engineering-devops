@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
-# comment for 0
-if [ "$#" -ne 4 ]; then
-    echo "Usage: $0 PATH_TO_FILE IP USERNAME PATH_TO_SSH_KEY"
+# This script transfers a file from the client to a server using scp
+
+# Variables from arguments
+FILE_PATH="$1"
+SSH_KEY_PATH="$2"
+USER="ubuntu"
+SERVER_IP="3.83.106.227"
+DEST_PATH="/root/alu-system_engineering-devops/web_server"
+# Check if arguments are provided
+if [ -z "$FILE_PATH" ] || [ -z "$SSH_KEY_PATH" ]; then
+    echo "Usage: $0 <file_path> <ssh_key_path>"
     exit 1
 fi
-PATH_TO_FILE=$1
-IP=$2
-USERNAME=$3
-PATH_TO_SSH_KEY=$4
+# Transfer the file using scp
+scp -i "$SSH_KEY_PATH" "$FILE_PATH" "$USER@$SERVER_IP:$DEST_PATH"
 
-scp -i "$PATH_TO_SSH_KEY" -o StrictHostKeyChecking=no "$PATH_TO_FILE" "$USERNAME@$IP:~/"
+echo "File transfer complete."
+
