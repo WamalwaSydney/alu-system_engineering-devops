@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Configures Nginx to serve a custom 404 page
+
+apt-get update
+apt-get install -y nginx
+
+echo "Ceci n'est pas une page" > /var/www/html/404.html
+
+cat > /etc/nginx/sites-available/default <<'EOL'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html index.htm;
+
+    server_name _;
+
+    error_page 404 /404.html;
+
+    location / {
+        return 200 "Holberton School";
+        add_header Content-Type text/plain;
+    }
+
+    location /redirect_me {
+        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
+    }
+
+    location = /404.html {
+        internal;
+    }
+}
+EOL
+
+service nginx restart
