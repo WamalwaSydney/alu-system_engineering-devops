@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Installs and configures Nginx on an Ubuntu server
+# Automatically configures Nginx to serve 'Holberton School' on port 80
 
+# Update package lists and install Nginx
 apt-get update
 apt-get install -y nginx
 
+# Configure Nginx to return text response
 cat > /etc/nginx/sites-available/default <<'EOL'
 server {
     listen 80 default_server;
@@ -21,4 +23,5 @@ server {
 }
 EOL
 
+# Restart Nginx to apply changes
 service nginx restart
