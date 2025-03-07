@@ -1,27 +1,28 @@
 #!/usr/bin/env bash
-# Automatically configures Nginx to serve 'Holberton School' on port 80
+# Configures Nginx to serve 'Holberton School' on port 80
 
-# Update package lists and install Nginx
+# Install Nginx
 apt-get update
 apt-get install -y nginx
 
-# Configure Nginx to return text response
+# Create custom index.html
+mkdir -p /var/www/html
+echo "Holberton School" > /var/www/html/index.html
+
+# Configure Nginx to serve from correct root
 cat > /etc/nginx/sites-available/default <<'EOL'
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-
+    
     root /var/www/html;
-    index index.html index.htm;
-
-    server_name _;
+    index index.html;
 
     location / {
-        return 200 "Holberton School";
-        add_header Content-Type text/plain;
+        try_files $uri $uri/ =404;
     }
 }
 EOL
 
-# Restart Nginx to apply changes
-service nginx restart
+# Validate configuration and restart
+nginx -t && service nginx restart
