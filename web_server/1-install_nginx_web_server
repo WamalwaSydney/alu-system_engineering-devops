@@ -2,14 +2,17 @@
 # Configures Nginx to serve 'Holberton School' on port 80
 
 # Install Nginx
-apt-get update
-apt-get install -y nginx
+apt-get update -qq && apt-get install -y nginx -qq
 
-# Create custom index.html
+# Configure web root
 mkdir -p /var/www/html
-echo "Holberton School" > /var/www/html/index.html
+echo "Holberton School" | tee /var/www/html/index.html >/dev/null
 
-# Configure Nginx to serve from correct root
+# Set permissions
+chown -R www-data:www-data /var/www/html
+chmod -R 755 /var/www
+
+# Configure Nginx server block
 cat > /etc/nginx/sites-available/default <<'EOL'
 server {
     listen 80 default_server;
@@ -24,5 +27,5 @@ server {
 }
 EOL
 
-# Validate configuration and restart
+# Validate and restart Nginx
 nginx -t && service nginx restart
