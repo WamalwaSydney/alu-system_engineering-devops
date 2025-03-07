@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Configures Nginx to serve 'Holberton School' on port 80
+# Configures Nginx to serve 'Holberton School' on port 80 with proper response format
 
 # Install Nginx
 apt-get update -qq && apt-get install -y nginx -qq
 
 # Configure web root
 mkdir -p /var/www/html
-echo "Holberton School" | tee /var/www/html/index.html >/dev/null
+echo "Holberton School" > /var/www/html/index.html
 
 # Set permissions
 chown -R www-data:www-data /var/www/html
@@ -22,7 +22,8 @@ server {
     index index.html;
 
     location / {
-        try_files $uri $uri/ =404;
+        add_header Content-Type text/plain;
+        return 200 "Holberton School";
     }
 }
 EOL
