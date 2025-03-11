@@ -1,49 +1,39 @@
 #!/usr/bin/env bash
-# Configures Nginx with a custom 404 page containing "Ceci n'est pas une page"
+# Configures a new ubuntu machine by installing
+# Nginx where it should be listening on port 80
+# Serve a page that would return a Hello World string
+#
 
-# Exit on error
-set -e
+echo -e "Updating and installing Nginx.\n"
+sudo apt-get update -y -qq && \
+	 sudo apt-get install nginx -y
 
-# Install Nginx if not installed
-apt-get update -qq && apt-get install -y nginx -qq
+echo -e "\nSetting up some minor stuff.\n"
 
-# Ensure the web root directory exists
-mkdir -p /var/www/html
+# starting nginx service
+sudo service nginx start
 
-# Create the custom 404 page
-echo "Ceci n'est pas une page" > /var/www/html/404.html
+# allowing nginx on firewall
+sudo ufw allow 'Nginx HTTP'
 
-# Configure Nginx with a custom 404 page
-cat > /etc/nginx/sites-available/default << 'EOL'
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+# Give the user ownership to website files for easy editing
+sudo chown -R "$USER":"$USER" /var/www/html
+sudo chmod -R 755 /var/www
 
-    root /var/www/html;
-    index index.html index.htm;
+# Backup default index
+cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bckp
 
-    server_name _;
+# Creating new index
+echo -e "Hello World!" > /var/www/html/index.nginx-debian.html
 
-    location / {
-        return 200 "Holberton School";
-        add_header Content-Type text/plain;
-    }
+# Setting up /redirect_me to a youtube video
+sudo sed -i '24i\	rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
 
-    location /redirect_me {
-        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
-    }
+# Set up a 404 page
+echo "Ceci n'est pas une page" >> /var/www/html/error_404.html
+sudo sed -i '25i\	error_page 404 /error_404.html;' /etc/nginx/sites-available/default
 
-    # Custom 404 page
-    error_page 404 /404.html;
-    location = /404.html {
-        internal;
-    }
-}
-EOL
+# Restarting nginx
+sudo service nginx restart
 
-# Ensure proper permissions
-chmod 644 /var/www/html/404.html
-
-# Test and reload Nginx configuration
-nginx -t && service nginx reload
-
+echo -e "\nCompleted.\n"
