@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# This script installs Nginx, configures it to listen on port 80, and ensures it returns HTTP 200.
+# This script installs Nginx, configures it to listen on port 80, and ensures it returns HTTP 200 with the default nginx page.
 
 # Install Nginx
 apt-get update
 apt-get install -y nginx
+
+# Ensure Nginx is not running before starting it
+service nginx stop
 
 # Start Nginx without using systemd (since it's not available in Docker containers)
 service nginx start
@@ -11,5 +14,18 @@ service nginx start
 # Ensure Nginx is listening on port 80
 ss -tuln | grep :80
 
-# Check if Nginx is running and responds with HTTP 200 on port 80
-curl -s -o /dev/null -w "%{http_code}\n" http://localhost:80
+# Wait for a moment to ensure the service starts and listens on port 80
+sleep 2
+
+# Test if Nginx is responding with HTTP 200
+http_status=$(curl -s -o /dev/null -w "%{http_code}\n" http://localhost:80)
+if [ "$http_status" -eq 200 ]; then
+    echo "HTTP 200 received"
+else
+    echo "HTTP Status: $http_status"
+fi
+
+# Check the content of the nginx default page
+page_content=$(curl -s http://localhost:80)
+echo "$page_content" | grep "Welcome to nginx!" && echo "Success" || echo "Failed"
+
