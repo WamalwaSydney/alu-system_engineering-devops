@@ -1,3 +1,15 @@
 #!/usr/bin/env bash
-# Install Nginx and configure it to listen on port 80
-apt-get update -y && apt-get install -y nginx && systemctl start nginx && systemctl enable nginx && sed -i "s/listen 80 default_server;/listen 80;/g" /etc/nginx/sites-enabled/default && systemctl restart nginx
+# Ensure Nginx is installed and running, listening on port 80
+
+# Install Nginx
+apt-get update
+apt-get install -y nginx
+
+# Start Nginx without using systemd (since it's not available in Docker containers)
+service nginx start
+
+# Check if Nginx is running
+ps aux | grep nginx
+
+# Ensure Nginx is listening on port 80
+ss -tuln | grep :80
