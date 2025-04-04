@@ -5,17 +5,17 @@
 apt-get update
 apt-get install -y nginx
 
-# Ensure Nginx is not running before starting it
-service nginx stop
+# Manually stop any existing Nginx process, if running
+pkill nginx
 
 # Start Nginx without using systemd (since it's not available in Docker containers)
-service nginx start
+nginx -g 'daemon off;' &
+
+# Wait for a moment to ensure the service starts and listens on port 80
+sleep 5
 
 # Ensure Nginx is listening on port 80
 ss -tuln | grep :80
-
-# Wait for a moment to ensure the service starts and listens on port 80
-sleep 2
 
 # Test if Nginx is responding with HTTP 200
 http_status=$(curl -s -o /dev/null -w "%{http_code}\n" http://localhost:80)
@@ -28,4 +28,3 @@ fi
 # Check the content of the nginx default page
 page_content=$(curl -s http://localhost:80)
 echo "$page_content" | grep "Welcome to nginx!" && echo "Success" || echo "Failed"
-
