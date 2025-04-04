@@ -20,7 +20,7 @@ ss -tuln | grep :80
 # Test if Nginx is responding with HTTP 200
 http_status=$(curl -s -o /dev/null -w "%{http_code}\n" http://localhost:80)
 if [ "$http_status" -eq 200 ]; then
-    echo "HTTP 200 received"
+    echo "2"
 else
     echo "HTTP Status: $http_status"
 fi
