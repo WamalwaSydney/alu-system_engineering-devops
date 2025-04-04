@@ -1,27 +1,11 @@
 #!/usr/bin/env bash
-# This script installs Nginx, configures it to listen on port 80, and ensures it returns HTTP 200 with the default nginx page.
+# Fix nginx default file's Symbolic link.
 
-# Install Nginx quietly
-apt-get update -qq > /dev/null 2>&1
-apt-get install -y nginx -qq > /dev/null 2>&1
+# Remove existing symbolic link
+rm /etc/nginx/sites-enabled/default
 
-# Stop any existing Nginx processes, if running
-pkill nginx 2>/dev/null
+# Create the symbolic link to the correct configuration
+ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-# Start Nginx in the background without using systemd
-nginx -g 'daemon off;' &
-
-# Allow time for Nginx to start
-sleep 5
-
-# Test if Nginx is responding with HTTP 200
-http_status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80)
-if [ "$http_status" -eq 200 ]; then
-    echo "HTTP 200 received"
-else
-    echo "HTTP Status: $http_status"
-fi
-
-# Check for the default nginx page content quietly and echo Success or Failed accordingly
-page_content=$(curl -s http://localhost:80)
-echo "$page_content" | grep "Welcome to nginx!" > /dev/null && echo "Success" || echo "Failed"
+# Restart the Nginx service
+service nginx restart
